@@ -1,0 +1,8 @@
+* text=auto
+*.java text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+release/*.txt text eol=crlf
+release/licenses/THIRD_PARTY.txt text eol=crlf
+*.png binary
+*.jar binary

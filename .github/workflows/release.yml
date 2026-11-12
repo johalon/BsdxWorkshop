@@ -1,0 +1,59 @@
+# Builds the Java-bundled Windows zip.
+#  - push a tag v*  -> creates a GitHub Release with the zip attached
+#  - manual run     -> the zip is kept as a workflow artifact (for testing / private sharing)
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash   # PowerShell would split -Dmaven.test.skip=true
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Build NeXAS_DX (fork, data layer)
+        # compile + jar + install only: the fork's own package phase builds its JavaFX app (javapackager), which is not needed here
+        run: mvn -B -f nexas_dx/pom.xml -Dmaven.test.skip=true compile jar:jar install:install
+
+      - name: Build BsdxWorkshop
+        run: mvn -B package
+
+      - name: Version
+        id: ver
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then v="${GITHUB_REF#refs/tags/v}"; else v="$(mvn -q -B help:evaluate -Dexpression=project.version -DforceStdout)-dev"; fi
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+      - name: Bundle Java runtime and zip
+        shell: pwsh
+        run: ./release/make_release.ps1 -Version "${{ steps.ver.outputs.version }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BsdxWorkshop-${{ steps.ver.outputs.version }}-win64
+          path: release/out/BsdxWorkshop-${{ steps.ver.outputs.version }}-win64.zip
+
+      - name: GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/out/BsdxWorkshop-${{ steps.ver.outputs.version }}-win64.zip
+          draft: true

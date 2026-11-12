@@ -1,0 +1,27 @@
+﻿BsdxWorkshop が使っているソフトウェアとライセンス
+==================================================
+
+NeXAS_DX (https://github.com/Karaik/NeXAS_DX)
+  データの読み書き部分（pac / waz / mek などの解析）。フォークに修正を加えて使用。
+  修正の内容はフォークのコミット履歴にあります（https://github.com/johalon/NeXAS_DX の bsdxworkshop ブランチ）。
+  MIT License, Copyright (c) 2024 这位同学  → NeXAS_DX-LICENSE.txt
+
+FlatLaf 3.5.4 (https://www.formdev.com/flatlaf/)  画面の見た目
+  Apache License 2.0  → Apache-2.0.txt
+
+Jackson 2.13 (https://github.com/FasterXML/jackson)  JSON 処理
+  Apache License 2.0  → Apache-2.0.txt
+
+Hutool 5.8.16 (https://github.com/dromara/hutool)  NeXAS_DX が使用
+  Mulan Permissive Software License v2  → Hutool-MulanPSL-2.0.txt
+
+SLF4J API 1.7 (https://www.slf4j.org/)
+  MIT License  → SLF4J-MIT.txt
+
+JOrbis / JOgg 0.0.17 (JCraft, http://www.jcraft.com/jorbis/)  ogg の再生
+  GNU LGPL 2.1  → JOrbis-LGPL-2.1.txt
+  ソース: https://github.com/ymnk/jorbis （同梱の jar 内の com/jcraft 以下を差し替えれば別版を使えます）
+
+Java 実行環境 (runtime フォルダ)
+  Java 17 の実行環境を jlink で最小構成にしたもの。ライセンスはビルドに使った JDK によります
+  （GitHub 版は Eclipse Temurin = OpenJDK、GPL v2 + Classpath Exception）。詳細は runtime\legal フォルダ。

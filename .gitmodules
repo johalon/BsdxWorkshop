@@ -1,0 +1,4 @@
+[submodule "nexas_dx"]
+	path = nexas_dx
+	url = https://github.com/johalon/NeXAS_DX.git
+	branch = bsdxworkshop

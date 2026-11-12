@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>bsdx.workshop</groupId>
+  <artifactId>BsdxWorkshop</artifactId>
+  <version>5.0.0</version>
+  <name>BsdxWorkshop</name>
+
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- src/test holds main()-style checks that need the game files (SelfTest, ScreenshotTool ...), not JUnit tests -->
+    <skipTests>true</skipTests>
+    <nexas.version>1.2.0</nexas.version>
+  </properties>
+
+  <dependencies>
+    <!-- data layer: the NeXAS_DX fork (git submodule nexas_dx/, installed by `mvn -f nexas_dx/pom.xml install`) -->
+    <dependency>
+      <groupId>com.nexas.dx</groupId>
+      <artifactId>NeXAS_DX</artifactId>
+      <version>${nexas.version}</version>
+      <exclusions>
+        <exclusion><groupId>cn.hutool</groupId><artifactId>hutool-poi</artifactId></exclusion>
+        <exclusion><groupId>org.apache.poi</groupId><artifactId>*</artifactId></exclusion>
+        <exclusion><groupId>ch.qos.logback</groupId><artifactId>*</artifactId></exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.formdev</groupId>
+      <artifactId>flatlaf</artifactId>
+      <version>3.5.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jcraft</groupId>
+      <artifactId>jorbis</artifactId>
+      <version>0.0.17</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>BsdxWorkshop</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <compilerArgs><arg>-proc:none</arg></compilerArgs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <filters>
+                <filter>
+                  <artifact>com.nexas.dx:NeXAS_DX</artifact>
+                  <excludes>
+                    <!-- NeXAS_DX's own JavaFX GUI is not used -->
+                    <exclude>com/giga/nexas/MainApplication*</exclude>
+                    <exclude>com/giga/nexas/controller/**</exclude>
+                    <exclude>**/*.fxml</exclude>
+                    <exclude>research/**</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>module-info.class</exclude>
+                    <exclude>META-INF/versions/*/module-info.class</exclude>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>bsdx.workshop.Main</mainClass>
+                  <manifestEntries>
+                    <Multi-Release>true</Multi-Release>
+                    <Implementation-Version>${project.version}</Implementation-Version>
+                  </manifestEntries>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
